@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from torch.autograd import Variable
+import torch.nn as nn
 import os
 import glob
 import h5py
@@ -18,7 +19,31 @@ from io_utils import model_dict, parse_args, get_resume_file, get_best_file, get
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-def save_features(model, data_loader, outfile ):
+def save_features(model, data_loader, outfile, finetune_iterations):
+    # TODO: number_classes
+    number_classes = -99
+    for _ in range(finetune_iterations):
+        avg_loss = 0
+        for x, y in data_loader:
+            x = x.to(device)
+            x_var = Variable(x)
+            feats = model(x_var)
+            linear_clf = nn.Linear(list(feats.size()[2]), number_classes)
+            linear_clf = linear_clf.to(device)
+            optimizer = torch.optim.SGD(linear_clf.parameters(), lr=0.01, momentum=0.9, dampening=0.9,
+                                            weight_decay=0.001)
+
+            loss_function = nn.CrossEntropyLoss()
+            loss_function = loss_function.to(device)
+
+            optimizer.zero_grad()
+
+            scores = linear_clf(feats)
+            loss = loss_function(scores, y)
+            loss.backward()
+            optimizer.step()
+            avg_loss = avg_loss + loss.data[0]
+
     f = h5py.File(outfile, 'w')
     max_count = len(data_loader)*data_loader.batch_size
     all_labels = f.create_dataset('all_labels',(max_count,), dtype='i')
@@ -124,4 +149,5 @@ if __name__ == '__main__':
     dirname = os.path.dirname(outfile)
     if not os.path.isdir(dirname):
         os.makedirs(dirname)
-    save_features(model, data_loader, outfile)
+
+    save_features(model, data_loader, outfile, int(params.finetune_iterations))
