@@ -21,14 +21,13 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 def save_features(model, data_loader, outfile, finetune_iterations):
     # TODO: number_classes
-    number_classes = -99
+    number_classes = 1
     for _ in range(finetune_iterations):
         avg_loss = 0
         for x, y in data_loader:
             x = x.to(device)
-            x_var = Variable(x)
-            feats = model(x_var)
-            linear_clf = nn.Linear(list(feats.size()[2]), number_classes)
+            feats = model(x)
+            linear_clf = nn.Linear(list(feats.size())[1], number_classes)
             linear_clf = linear_clf.to(device)
             optimizer = torch.optim.SGD(linear_clf.parameters(), lr=0.01, momentum=0.9, dampening=0.9,
                                             weight_decay=0.001)
