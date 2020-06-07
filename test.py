@@ -17,10 +17,11 @@ from data.datamgr import SetDataManager
 from methods.baselinetrain import BaselineTrain
 from methods.baselinefinetune import BaselineFinetune
 from methods.protonet import ProtoNet
+from methods.protonetn import ProtoNetN
 from methods.matchingnet import MatchingNet
 from methods.relationnet import RelationNet
 from methods.maml import MAML
-from io_utils import model_dict, parse_args, get_resume_file, get_best_file , get_assigned_file
+from io_utils import model_dict, parse_args, get_resume_file, get_best_file , get_assigned_file, get_assigned_filepp, get_best_filepp
 
 def feature_evaluation(cl_data_file, model, n_way = 5, n_support = 5, n_query = 15, adaptation = False):
     class_list = cl_data_file.keys()
@@ -63,6 +64,8 @@ if __name__ == '__main__':
         model           = BaselineFinetune( model_dict[params.model], loss_type = 'dist', **few_shot_params )
     elif params.method == 'protonet':
         model           = ProtoNet( model_dict[params.model], **few_shot_params )
+    elif params.method == 'protonetn':
+        model           = ProtoNetN( model_dict[params.model], **few_shot_params )
     elif params.method == 'matchingnet':
         model           = MatchingNet( model_dict[params.model], **few_shot_params )
     elif params.method in ['relationnet', 'relationnet_softmax']:
@@ -102,9 +105,15 @@ if __name__ == '__main__':
 
     if not params.method in ['baseline', 'baseline++'] : 
         if params.save_iter != -1:
-            modelfile   = get_assigned_file(checkpoint_dir,params.save_iter)
+            if params.protonetpp == False:
+                modelfile   = get_assigned_file(checkpoint_dir,params.save_iter)
+            else:
+                modelfile = get_assigned_filepp(checkpoint_dir, params.save_iter, params.additional_iter)
         else:
-            modelfile   = get_best_file(checkpoint_dir)
+            if params.protonetpp == False:
+                modelfile   = get_best_file(checkpoint_dir)
+            else:
+                modelfile = get_best_filepp(checkpoint_dir, params.additional_iter)
         if modelfile is not None:
             tmp = torch.load(modelfile)
             model.load_state_dict(tmp['state'])
@@ -118,8 +127,10 @@ if __name__ == '__main__':
         if 'Conv' in params.model:
             if params.dataset in ['omniglot', 'cross_char']:
                 image_size = 28
+            elif params.dataset == "CIFARFS":
+                image_size = 32
             else:
-                image_size = 84 
+                image_size = 84
         else:
             image_size = 224
 
@@ -143,9 +154,27 @@ if __name__ == '__main__':
             model.task_update_num = 100 #We perform adaptation on MAML simply by updating more times.
         model.eval()
         acc_mean, acc_std = model.test_loop( novel_loader, return_std = True)
+    elif params.method == 'protonetn':
+        if 'Conv' in params.model:
+            if params.dataset in ['omniglot', 'cross_char']:
+                image_size = 28
+            elif params.dataset == "CIFARFS":
+                image_size = 32
+            else:
+                image_size = 84
+        else:
+            image_size = 224
 
+        loadfile = configs.data_dir[params.dataset] + split + '.json'
+        datamgr = SetDataManager(image_size, n_eposide=iter_num, n_query=15, **few_shot_params)
+        novel_loader = datamgr.get_data_loader(loadfile, aug=False)
+
+        acc_mean, acc_std = model.test_loop2( novel_loader, modelfile, params.new_iter, adaptation = params.adaptation)
     else:
-        novel_file = os.path.join( checkpoint_dir.replace("checkpoints","features"), split_str +".hdf5") #defaut split = novel, but you can also test base or val classes
+        if params.protonetpp == False:
+            novel_file = os.path.join( checkpoint_dir.replace("checkpoints","features"), split_str +".hdf5") #defaut split = novel, but you can also test base or val classes
+        else:
+            novel_file = os.path.join(checkpoint_dir.replace("checkpoints", "features"), split_str + "pp" + ".hdf5")
         cl_data_file = feat_loader.init_loader(novel_file)
 
         for i in range(iter_num):
