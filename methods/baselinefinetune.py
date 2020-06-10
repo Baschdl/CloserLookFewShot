@@ -12,6 +12,7 @@ class BaselineFinetune(MetaTemplate):
     def __init__(self, model_func,  n_way, n_support, loss_type = "softmax"):
         super(BaselineFinetune, self).__init__( model_func,  n_way, n_support)
         self.loss_type = loss_type
+        self.feat_dim = 256
 
     def set_forward(self,x,is_feature = True):
         return self.set_forward_adaptation(x,is_feature); #Baseline always do adaptation
