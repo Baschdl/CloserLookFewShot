@@ -84,6 +84,8 @@ if __name__ == '__main__':
     if 'Conv' in params.model:
         if params.dataset in ['omniglot', 'cross_char']:
             image_size = 28
+        elif params.dataset == 'CIFARFS':
+            image_size = 32
         else:
             image_size = 84 
     else:
