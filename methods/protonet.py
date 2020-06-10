@@ -14,6 +14,7 @@ class ProtoNet(MetaTemplate):
     def __init__(self, model_func,  n_way, n_support):
         super(ProtoNet, self).__init__( model_func,  n_way, n_support)
         self.loss_fn = nn.CrossEntropyLoss()
+        self.feat_dim = 256
 
 
     def set_forward(self,x,is_feature = False):
