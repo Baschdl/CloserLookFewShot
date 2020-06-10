@@ -16,12 +16,15 @@ class RelationNet(MetaTemplate):
         super(RelationNet, self).__init__(model_func,  n_way, n_support)
 
         self.loss_type = loss_type  #'softmax'# 'mse'
+        self.feat_dim = [64, 6, 6]  # this line is only for CIFARFS!!!
         self.relation_module = RelationModule( self.feat_dim , 8, self.loss_type ) #relation net features are not pooled, so self.feat_dim is [dim, w, h] 
 
         if self.loss_type == 'mse':
             self.loss_fn = nn.MSELoss()  
         else:
             self.loss_fn = nn.CrossEntropyLoss()
+
+
 
     def set_forward(self,x,is_feature = False):
         z_support, z_query  = self.parse_feature(x,is_feature)
