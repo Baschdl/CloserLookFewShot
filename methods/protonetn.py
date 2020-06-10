@@ -58,7 +58,7 @@ class ProtoNetN(MetaTemplate):
                 self.n_way = x.size(0)
             correct_this, count_this = self.correct2(x, modelfile, new_iter, adaptation)
             acc_all.append(correct_this / count_this * 100)
-            #print('%d result acc %4.2f%% ' % (iter_num, (correct_this / count_this * 100)))
+            print('%d result acc %4.2f%% ' % (iter_num, (correct_this / count_this * 100)))
 
         acc_all = np.asarray(acc_all)
         acc_mean = np.mean(acc_all)
