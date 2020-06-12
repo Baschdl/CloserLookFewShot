@@ -3,7 +3,9 @@
 This repo contains the reference source code for the paper [A Closer Look at Few-shot Classification](https://arxiv.org/abs/1904.04232) in International Conference on Learning Representations (ICLR 2019). In this project, we provide a integrated testbed for a detailed empirical study for few-shot classification.
 With additions for our project work in the lecture [Optimization for machine learning](https://edu.epfl.ch/coursebook/en/optimization-for-machine-learning-CS-439) at EPFL.
 
-To reproduce our experiments run [Determine_additional_iterations.ipynb](https://github.com/Baschdl/CloserLookFewShot/blob/master/Determine_additional_iterations.ipynb) and [Experiments.ipynb](https://github.com/Baschdl/CloserLookFewShot/blob/master/Experiments.ipynb).
+To reproduce our experiments run [Experiments.ipynb](https://github.com/Baschdl/CloserLookFewShot/blob/master/Experiments.ipynb) on Colab.
+Or 
+Clone this repo to local and run locally.
 
 ## Citation
 If you find our code useful, please consider citing our work using the bibtex:
@@ -28,8 +30,32 @@ To install the dependencies use `pip3 install -r requirements-cpu.txt -f https:/
 ### CIFARFS
 * Change to directory ./filelists/CIFARFS
 * run `source ./download_Cifar.sh`
-* run `python3 create-dataset.py` which you can edit to create a different dataset by choosing other classes
+For each domain-shift experiments:
+* Change to directory ./CloserLookFewShot
+* run `cp ./split_files/split_CIFAR_Plant2fruit.py ../ && cd ../`
+* run `python3 split_CIFAR_Plant2fruit.py && rm split_CIFAR_Plant2fruit.py && cd ./CloserLookFewShot` 
+* The [split_CIFAR_Plant2fruit.py] in the file name can be replaced by [split_CIFAR_Land2Aquatic.py], [split_CIFAR_Land2Insect.py], [split_CIFAR_Land2Water.py], [split_CIFAR_Outdoor2Vehicles.py] or [split_CIFAR_NoShift.py]
 
+## Train
+Run 
+```python3 ./train.py --dataset CIFARFS --model Conv4 --method [METHODNAME] --start_epoch 0 --stop_epoch 100 --train_n_way 3 --test_n_way 3 --n_shot [N_SHOT]```
+
+[METHODNAME] is one from baseline/baseline++/relationnet/protonet/protonetn
+
+## Save Features
+Run
+```python3 ./save_features.py --dataset CIFARFS --model Conv4 --method [METHODNAME] --save_iter -1 --train_n_way 3 --test_n_way 3 --n_shot [N_SHOT]```
+
+[METHODNAME] is one from baseline/baseline++/relationnet/protonet, note that for protonetn, no save_feature.py is needed.
+
+## Test
+Run
+```python3 ./test.py --dataset CIFARFS --model Conv4 --method [METHODNAME] --save_iter -1 --test_n_way 3 --train_n_way 3 --n_shot $n_shot [--OPTIONARG]```
+
+[--OPTIONARG] is --adaptation for all methods expect protonetn. For protonetn --new_iter [NEW_ITER] is optional to change the fine-tune iterations for novel set, the default value is 1.
+
+## The original Readme from CloserLookFewShot 
+## Dataset
 ### CUB
 * Change directory to `./filelists/CUB`
 * run `source ./download_CUB.sh`
@@ -89,29 +115,7 @@ and `nvidia-docker run -v  $(pwd):/repo closerlookfewshot [command]`,
 e.g. `nvidia-docker run -v  $(pwd):/repo closerlookfewshot python3 /repo/train.py --dataset CUB --model Conv4 --method baseline --train_aug`.
 Change the CUDA version in `10.2-cudnn7-runtime-ubuntu16.04` (`Dockerfile-gpu`) if you have another version than 10.2.
 
-## Protonetn
-Deal with domain shift, backbone learns novel features. Also note that protonetn does not support 1-shot learning, at least two is needed for each class for further adaptation.
-
-### Prepare datasets
-3-way train, 3-way test
-base_classes = ["poppy", "rose", "tulip", "palm_tree", "pine_tree", "oak_tree", "willow_tree"];
-val_classes = ["orchid", "sunflower", "maple_tree"];
-novel_classes = ["apple", "pear", "mushroom"];
-
-### Train
-Run
-```python3 ./train.py --dataset CIFARFS --model Conv4 --method protonetn --start_epoch 0 --stop_epoch 100 --train_n_way 3 --test_n_way 3 --n_shot 5```
-
-### Save Features (backbone learn and save)
-There is no save features for this case, protonetn without adaptation is just train and test with protonet, and skip the save feature step, the test.py with read images directly. 
-
-### Test (with updated backbone, should have same performance as protonet)
-Run
-```python3 ./train.py --dataset CIFARFS --model Conv4 --method protonetn --save_iter 99 --test_n_way 3 --train_n_way 3 --n_shot 5```
-
-### Test (with updated backbone)
-Run
-```python3 ./train.py --dataset CIFARFS --model Conv4 --method protonetn --save_iter 99 --test_n_way 3 --train_n_way 3 --n_shot 5 --adaptation --new_iter 5```
+`
 
 ## References
 Our testbed builds upon several existing publicly available code. Specifically, we have modified and integrated the following code into this project:
