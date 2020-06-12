@@ -1,7 +1,9 @@
 # A Closer Look at Few-shot Classification
 
 This repo contains the reference source code for the paper [A Closer Look at Few-shot Classification](https://arxiv.org/abs/1904.04232) in International Conference on Learning Representations (ICLR 2019). In this project, we provide a integrated testbed for a detailed empirical study for few-shot classification.
+With additions for our project work in the lecture [Optimization for machine learning](https://edu.epfl.ch/coursebook/en/optimization-for-machine-learning-CS-439) at EPFL.
 
+To reproduce our experiments run [Determine_additional_iterations.ipynb](https://github.com/Baschdl/CloserLookFewShot/blob/master/Determine_additional_iterations.ipynb) and [Experiments.ipynb](https://github.com/Baschdl/CloserLookFewShot/blob/master/Experiments.ipynb).
 
 ## Citation
 If you find our code useful, please consider citing our work using the bibtex:
