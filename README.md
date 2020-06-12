@@ -7,18 +7,6 @@ To reproduce our experiments run [Experiments.ipynb](https://github.com/Baschdl/
 Or 
 Clone this repo to local and run locally.
 
-## Citation
-If you find our code useful, please consider citing our work using the bibtex:
-```
-@inproceedings{
-chen2019closerfewshot,
-title={A Closer Look at Few-shot Classification},
-author={Chen, Wei-Yu and Liu, Yen-Cheng and Kira, Zsolt and Wang, Yu-Chiang and  Huang, Jia-Bin},
-booktitle={International Conference on Learning Representations},
-year={2019}
-}
-```
-
 ## Enviroment
  - Python3
  - [Pytorch](http://pytorch.org/) >= 1.0
@@ -30,6 +18,7 @@ To install the dependencies use `pip3 install -r requirements-cpu.txt -f https:/
 ### CIFARFS
 * Change to directory ./filelists/CIFARFS
 * run `source ./download_Cifar.sh`
+
 For each domain-shift experiments:
 * Change to directory ./CloserLookFewShot
 * run `cp ./split_files/split_CIFAR_Plant2fruit.py ../ && cd ../`
@@ -53,6 +42,10 @@ Run
 ```python3 ./test.py --dataset CIFARFS --model Conv4 --method [METHODNAME] --save_iter -1 --test_n_way 3 --train_n_way 3 --n_shot $n_shot [--OPTIONARG]```
 
 [--OPTIONARG] is --adaptation for all methods expect protonetn. For protonetn --new_iter [NEW_ITER] is optional to change the fine-tune iterations for novel set, the default value is 1.
+
+
+
+
 
 ## The original Readme from CloserLookFewShot 
 ## Dataset
