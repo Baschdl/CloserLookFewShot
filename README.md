@@ -1,4 +1,4 @@
-# A Closer Look at Few-shot Classification
+# Robustness of Few-Shot Learning under Domain Shift
 
 This repo contains the reference source code for the paper [A Closer Look at Few-shot Classification](https://arxiv.org/abs/1904.04232) in International Conference on Learning Representations (ICLR 2019). In this project, we provide a integrated testbed for a detailed empirical study for few-shot classification.
 With additions for our project work in the lecture [Optimization for machine learning](https://edu.epfl.ch/coursebook/en/optimization-for-machine-learning-CS-439) at EPFL.
@@ -6,6 +6,8 @@ With additions for our project work in the lecture [Optimization for machine lea
 To reproduce our experiments run [Experiments.ipynb](https://github.com/Baschdl/CloserLookFewShot/blob/master/Experiments.ipynb) on Colab.
 Or 
 Clone this repo to local and run locally.
+
+For a more details have a look at our [report](https://github.com/Baschdl/CloserLookFewShot/blob/master/report.pdf).
 
 ## Enviroment
  - Python3
